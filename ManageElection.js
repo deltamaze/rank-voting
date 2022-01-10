@@ -1,25 +1,50 @@
 // variables
 let candidates = [];
-let voters = [];
+// let voters = [];
 let electionName = "";
 let electionId = "";
+let inputElectionId = ""
 let savedStatus = "";
+let adminPassword = "";
 
 //document elements
-let inputExistingElectionId = document.getElementById("InputExistingElectionId").value;
+let inputExistingElectionId = document.getElementById("InputExistingElectionId");
 let divElectionId = document.getElementById("DivElectionId");
 let inputElectionName = document.getElementById("InputElectionName");
+let inputAdminPassword = document.getElementById("InputAdminPassword");
 let divCandidateBlock = document.getElementById("DivCandidateBlock");
-let divVoterBlock = document.getElementById("DivVoterBlock");
+// let divVoterBlock = document.getElementById("DivVoterBlock");
 let divSaveStatus = document.getElementById("DivSaveStatus")
 let divErrorStatus = document.getElementById("DivErrorStatus")
+
+inputElectionName.addEventListener("keydown", function (event) {
+  electionName = event.target.value;
+  delayedSave();
+});
 
 inputElectionName.addEventListener("change", function (event) {
   electionName = event.target.value;
   delayedSave();
 });
 
+inputAdminPassword.addEventListener("keydown", function (event) {
+  adminPassword = event.target.value;
+});
+
+inputAdminPassword.addEventListener("change", function (event) {
+  adminPassword = event.target.value;
+});
+
+inputExistingElectionId.addEventListener("keydown", function (event) {
+  inputElectionId = event.target.value;
+});
+
+inputExistingElectionId.addEventListener("change", function (event) {
+  inputElectionId = event.target.value;
+});
+
 const delimCharacter = "~";
+
 function addNewElection() {
   // A post entry.
   const postData = {
@@ -29,11 +54,12 @@ function addNewElection() {
       `candidate2`,
       `candidate3`
     ]),
-    voters: package([
-      `id${Math.floor(1000 + Math.random() * 9000).toString()}`,
-      `id${Math.floor(1000 + Math.random() * 9000).toString()}`,
-      `id${Math.floor(1000 + Math.random() * 9000).toString()}`
-    ])
+    password: adminPassword
+    // voters: package([
+    //   `id${Math.floor(1000 + Math.random() * 9000).toString()}`,
+    //   `id${Math.floor(1000 + Math.random() * 9000).toString()}`,
+    //   `id${Math.floor(1000 + Math.random() * 9000).toString()}`
+    // ])
   };
 
   // Get a key for a new Post.
@@ -43,11 +69,13 @@ function addNewElection() {
     divErrorStatus.innerHTML = err.toString();
   });
 }
+
 function loadPreviouslySavedElectionButtonClick() {
-  searchElection(inputExistingElectionId);
+  searchElection(inputElectionId);
 }
-function searchElection(inputExistingElectionId) {
-  get(ref(database, `Elections/${inputExistingElectionId}`)).then(data => {
+
+function searchElection(targetElection) {
+  get(ref(database, `Elections/${targetElection}`)).then(data => {
     if (data.exists()) {
       loadElection(data);
     } else {
@@ -68,89 +96,96 @@ function loadElection(electionSnapshot) {
   electionName = electionData.name;
   //candidates
   candidates = unpack(electionData.candidates);
-  //voters
-  voters = unpack(electionData.voters);
+  // //voters
+  // voters = unpack(electionData.voters);
   syncVariablesToInputs();
 }
+
 function syncVariablesToInputs() {
   syncElectionId();
   syncName();
   syncCandidates();
-  syncVoters();
+  // syncVoters();
   syncSaveStatus();
   syncErrorStatus();
 }
+
 function syncSaveStatus() {
   divSaveStatus.innerHTML = "Up to date";
+  divErrorStatus.innerHTML = "";
 }
+
 function syncErrorStatus() {
   divErrorStatus.innerHTML = "";
 }
+
 function syncElectionId() {
 
   divElectionId.innerHTML = `Target Election ID: ${electionId}`;
 }
+
 function syncName() {
 
   inputElectionName.value = electionName;
 
 }
-function populateUpdateDeleteList(stringArray, targetElement) {
 
-  if (targetElement != null) {
-    while (targetElement.firstChild) {
-      targetElement.removeChild(targetElement.firstChild);
+function populateUpdateDeleteList(stringArray, targetElement) {
+  
+}
+
+function syncCandidates() {
+  if (divCandidateBlock != null) {
+    while (divCandidateBlock.firstChild) {
+      divCandidateBlock.removeChild(divCandidateBlock.firstChild);
     }
   }
 
-  for (let x = 0; x < stringArray.length; x += 1) {
+  for (let x = 0; x < candidates.length; x += 1) {
     let textInput = document.createElement("input");
-    textInput.id = `textInput${x}}`
+    textInput.id = `textInput${x}`
     textInput.type = "text"
-    textInput.value = stringArray[x];
+    textInput.value = candidates[x];
+    textInput.addEventListener("keydown", function (event) {
+      candidates[x] = event.target.value;
+      delayedSave();
+    })
     textInput.addEventListener("change", function (event) {
-      stringArray[x].value = event.target.value;
+      candidates[x] = event.target.value;
       delayedSave();
     })
     let deleteButton = document.createElement("input");
-    deleteButton.id = `deleteInput${x}}`
+    deleteButton.id = `deleteInput${x}`
     deleteButton.type = "button"
     deleteButton.value = "Delete"
     deleteButton.onclick = () => {
-      stringArray.splice(x, 1);
+      candidates.splice(x, 1);
       syncCandidates();
-      syncVoters();
+      // syncVoters();
       delayedSave();
     };
     let linebreak = document.createElement("br");
-    targetElement.appendChild(textInput);
-    targetElement.appendChild(deleteButton);
-    targetElement.appendChild(linebreak);
+    divCandidateBlock.appendChild(textInput);
+    divCandidateBlock.appendChild(deleteButton);
+    divCandidateBlock.appendChild(linebreak);
   }
 }
-function syncCandidates() {
-  populateUpdateDeleteList(candidates, divCandidateBlock, "Candidate")
-}
-function syncVoters() {
-  populateUpdateDeleteList(voters, divVoterBlock, "Voter")
-}
+
+// function syncVoters() {
+//   populateUpdateDeleteList(voters, divVoterBlock, "Voter")
+// }
+
 function addCandidate() {
   candidates.push("New Candidate");
   syncCandidates();
   delayedSave();
 }
-function updateCandidate() {
 
-}
-function addVoter() {
-  candidates.push("New Candidate");
-  syncCandidates();
-  delayedSave();
-}
-function updateVoter() {
-
-}
-
+// function addVoter() {
+//   candidates.push("New Candidate");
+//   syncCandidates();
+//   delayedSave();
+// }
 
 function package(array) {
   // edge cases
@@ -177,14 +212,6 @@ function unpack(packedString) {
   return array;
 }
 
-function test(data) {
-  console.log(package([
-    `id${Math.floor(1000 + Math.random() * 9000).toString}`,
-    `id${Math.floor(1000 + Math.random() * 9000).toString}`,
-    `id${Math.floor(1000 + Math.random() * 9000).toString}`
-  ]));
-}
-
 function debounce(func, wait, immediate) {
   var timeout;
   return function () {
@@ -204,16 +231,17 @@ function save() {
   // A post entry.
   const postData = {
     name: electionName,
+    password: adminPassword,
     candidates: package(candidates),
-    voters: package(voters)
+    // voters: package(voters)
   };
   set(ref(database, `Elections/${electionId}`), postData).then(data => {
     syncSaveStatus();
   }).catch(err => {
     divErrorStatus.innerHTML = err.toString();
   });
-
 }
+
 const debouncedSave = debounce(function () {
   save()
 }, 2000);
@@ -227,3 +255,5 @@ function delayedSave() {
   debouncedSave();
 
 }
+//TODO display links for Voting/Results
+//TODO Hide html Elements when no electionID is loaded
