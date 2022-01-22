@@ -218,9 +218,6 @@ function save() {
     rankedCandidates: package(rankedArray)
   };
 
-  console.log(`/Ballots/${electionId}/${voterId}`);
-  console.log(postData);
-
   set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
     divSaveStatus.innerHTML = "Vote Submitted";
     divErrorStatus.innerHTML="";

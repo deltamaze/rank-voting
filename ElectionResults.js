@@ -1,5 +1,5 @@
 // variables
-let candidates = [];
+let candidates = {};
 let electionName = "";
 let electionId = "";
 
@@ -50,7 +50,7 @@ function searchElection() {
     }
     return;
   }
-  get(ref(database, `Election/${electionId}`)).then(data => {
+  get(ref(database, `Elections/${electionId}`)).then(data => {
     if (data.exists()) {
       loadElectionName(data);
       divErrorStatus.innerHTML = ""
@@ -62,18 +62,19 @@ function searchElection() {
       divErrorStatus.innerHTML = "Database Error while looking up ElectionID. err=> " + err.toString();
     });;
 
-  //   get(ref(database, `Ballots/${electionId}`)).then(data => {
-  //     if (data.exists()) {
-  //       loadElectionData(data);
-  //       divErrorStatus.innerHTML = ""
-  //     } else {
-  //       divErrorStatus.innerHTML = "Election Ballots Not Found in Database"
-  //     }
-  //   })
-  //     .catch(err => {
-  //       divErrorStatus.innerHTML = "Database Error while looking up ElectionID in Ballots. err=> " + err.toString();
-  //     });;
-  // }
+  get(ref(database, `Ballots/${electionId}`)).then(data => {
+    if (data.exists()) {
+      loadBallotData(data);
+      divErrorStatus.innerHTML = ""
+    } else {
+      divErrorStatus.innerHTML = "Election Ballots Not Found in Database"
+    }
+  })
+    .catch(err => {
+      divErrorStatus.innerHTML = "Database Error while looking up ElectionID in Ballots. err=> " + err.toString();
+    });
+
+  syncVariablesToInputs();
 }
 
 function loadElectionName(electionSnapshot) {
@@ -83,25 +84,40 @@ function loadElectionName(electionSnapshot) {
   let electionData = electionSnapshot.val()
   //name
   electionName = electionData.name;
-  console.log(electionData);
   //candidates
-  //candidates = unpack(electionData.candidates);
-  syncVariablesToInputs();
+  let rawCandidates = unpack(electionData.candidates);
+  rawCandidates.forEach(name => {
+    if(candidates[name] == undefined){
+      candidates[name] = (new Candidates());
+    }
+  })
 }
 
-function loadElectionData(electionSnapshot) {
+function loadBallotData(ballotSnapshot) {
 
-  //id
-  console.log(electionData);
-  //candidates
-  //candidates = unpack(electionData.candidates);
-  syncVariablesToInputs();
-}
+
+  let ballotData = ballotSnapshot.val()
+  console.log(ballotData);
+  // loop through ballot
+
+  Object.keys(ballotData).forEach(function (key) {
+    var rankedVote = unpack(ballotData[key].rankedCandidates)
+    for(let i = 0; i < rankedVote.length; i++){
+      if(candidates[rankedVote[i]] != undefined){
+        candidates[rankedVote[i]].votePerRank[i] += 1;
+      }
+    }
+  })
+  }
 
 function syncVariablesToInputs() {
   syncName();
   syncCandidates();
   syncErrorStatus();
+  syncResults();
+}
+function syncResults() {
+  console.log("Not Implemented");
 }
 function syncSaveStatus() {
   divSaveStatus.innerHTML = "Vote has not been submitted";
@@ -131,3 +147,37 @@ function unpack(packedString) {
   return array;
 }
 
+class Candidates{
+  constructor(){
+    this.votePerRank = new Array(1000);
+    this.votePerRank.fill(0);
+    this.IsEliminated = false;
+  }
+}
+
+
+// so if bookclub has 7 books, identify count on the election table
+
+// 7 books
+
+// get all ballots, example: 6 ballots
+
+// 6 ballots means winner needs 3 votes
+// if 7 ballots, 50% is 3.5 so round up to 4 votes
+
+// first round, tally up all the ballots[0] against the master list
+// master list = {book title, votePoints, roundUpdate, currentRank, isEliminated, previousRank
+// book
+
+
+// getVote(ballot,masterList,roundNum) return selectionName
+// -- use master list to skip eliminated entries
+
+// when tie, use base64 encoding string compare to determine winner/elimination
+
+// loop that will state
+
+// Round #
+// if round != 0, if foundwinner=false : (elimination text
+// Results
+// if founderwinner = true
