@@ -208,6 +208,13 @@ function save() {
   // A post entry.
   
   let voterId = inputVoterId.value;
+  if(voterId == ''){
+    alert('Please Enter your VoterId')
+    inputVoterId.style.border = "2px solid red";
+    window.scrollTo(0, 0);
+    return;
+  }
+  inputVoterId.style.border = "2px solid black";
   // loop through ol and read entries in order
   let rankedArray = []
   var listItems = document.querySelectorAll('.draggable');
