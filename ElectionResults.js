@@ -190,6 +190,12 @@ function calculateResults() {
     let displayHtml = ""
     displayHtml += "<table class ='tableStyling'><thead><tr><th>Candidate</th><th>First Picks</th><th>Second Picks</th><th>Third Picks</th></tr></thead>";
     displayHtml += "<tbody>"
+    let firstPickStyling = "";
+    if(roundNum > 0 &&
+      targetCandidate.firstPick - targetCandidate.previousFirstPicks > 0){
+        firstPickStyling = 'background-color: lightgreen' 
+      }
+
     candidateKeys.forEach(key => {
       let targetCandidate = candidates[key];
       displayHtml += '<tr>'
