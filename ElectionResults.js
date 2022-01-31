@@ -127,8 +127,6 @@ function parseElectionData() {
 function parseBallotData() {
 
   let ballotData = rawBallotData.val()
-  console.log(ballotData);
-  // loop through ballot
   let ballotKeys = Object.keys(ballotData);
   ballots = new Array(ballotKeys.length);
   let insertIndex = 0;
@@ -146,26 +144,26 @@ function parseBallotData() {
 function calculateResults() {
   let candidateKeys = Object.keys(candidates);
   let maxRoundsAllowed = 1000;
-
+  divInfo.innerHTML = "Scroll to the bottom to see the winner <br /><br /><br />"
   if (candidateKeys.length < 1) {
-    console.log("No Candidates Found for Election");
+    divInfo.innerHTML += "No Candidates Found for Election <br />";
     return;
   }
   if (candidateKeys.length == 1) {
-    console.log("Only one Candidate found, winner is:" + candidateKeys[0]);
+    divInfo.innerHTML += `Only one Candidate found, winner is: ${candidateKeys[0]}<br />`;
     return;
   }
   let roundNum = 0;
 
   while (candidateKeys.length > 1) {
     if (roundNum > maxRoundsAllowed) {
-      throwUserError(`Round Number exceeded ${maxRoundsAllowed} That's probably not good`)
+      divInfo.innerHTML += `Round Number exceeded ${maxRoundsAllowed} That's probably not good<br />`;
     }
 
     tallyVotes(candidateKeys, roundNum);
-    console.log(`Current round: ${roundNum + 1}`)
+    divInfo.innerHTML += `<br /><br />Current round: ${roundNum + 1}<br />`;
     // report standings
-    console.log('Standings')
+    divInfo.innerHTML += 'Standings<br />';
     // sort
     candidateKeys.sort(function (a, b) {
       if (candidates[a].firstPick > candidates[b].firstPick) {
@@ -189,13 +187,20 @@ function calculateResults() {
       return 0;
     });
     // display
+    let displayHtml = ""
+    displayHtml += "<table class ='tableStyling'><thead><tr><th>Candidate</th><th>First Picks</th><th>Second Picks</th><th>Third Picks</th></tr></thead>";
+    displayHtml += "<tbody>"
     candidateKeys.forEach(key => {
       let targetCandidate = candidates[key];
-      console.log(`${key} First Picks${targetCandidate.firstPick} 
-      Second Picks${targetCandidate.secondPick} 
-      Third Picks${targetCandidate.thirdPick}`);
-
+      displayHtml += '<tr>'
+      displayHtml += `<td>${key}</td>`;
+      displayHtml += `<td style="${targetCandidate.firstPick - targetCandidate.previousFirstPicks > 0 ? 'color : green' : ''}"} >${targetCandidate.firstPick}</td>`;
+      displayHtml += `<td>${targetCandidate.secondPick}</td>`;
+      displayHtml += `<td>${targetCandidate.thirdPick}</td>`;
+      displayHtml += '</tr>'
     })
+    displayHtml += "</tbody></table>";
+    divInfo.innerHTML += displayHtml;
 
     // elimination
     // loop through and find candidate with least votes and eliminate
@@ -263,7 +268,7 @@ function calculateResults() {
       choppingBlockRoundMinVotes = null;
     }
     if (choppingBlock.length == 1) {
-      console.log(`Candidate with the least votes found: ${choppingBlock[0]}`);
+      divInfo.innerHTML += `Candidate with the least votes found: ${choppingBlock[0]}<br />`
     }
     if (choppingBlock.length > 1) {
       // identify last round updates
@@ -274,16 +279,16 @@ function calculateResults() {
       // remove candidates who reached firstLevelPicks before others on the chopping block
       for (let i = choppingBlock.length - 1; i >= 0; i -= 1) {
         if (candidates[choppingBlock[i]].firstPickUpdateRound < maxRoundNum) {
-          console.log(`${choppingBlock[i]} Received ${candidates[choppingBlock[i]].firstPickUpdateRound} votes in a round sooner than others, so has been marked safe`);
+          divInfo.innerHTML += `${choppingBlock[i]} Received ${candidates[choppingBlock[i]].firstPickUpdateRound} votes in a round sooner than others, so has been marked safe<br />`;
           choppingBlock.splice(i, 1);
         }
       }
     }
     if (choppingBlock.length > 1) {
-      console.log(`${choppingBlock.length} way tie for the least votes. Candidate will need a random tie breaker`);
-      
+      divInfo.innerHTML += `${choppingBlock.length} way tie for the least votes. Candidate will need a random tie breaker<br />`;
+
       choppingBlock.sort(function (a, b) {
-        // base64 encode, so some element of randomness, and not just alphabetical
+        // use reverse string then sort to make less intuitive how tie breaker works, and slightly more random
         let aString = a.split('').reverse().join('');
         let bString = b.split('').reverse().join('');
         if (aString < bString) {
@@ -297,10 +302,10 @@ function calculateResults() {
     }
     for (let i = choppingBlock.length - 1; i >= 0; i -= 1) {
       if (i > 0) {
-        console.log(`${choppingBlock[i]} marked safe`);
+        divInfo.innerHTML += `${choppingBlock[i]} marked safe<br />`
       }
     }
-    console.log(`Eliminating ${choppingBlock[0]}`);
+    divInfo.innerHTML += `Eliminating ${choppingBlock[0]}<br />`;
     // re-assign votes
     ballots.forEach(bal => {
       bal.eliminateCandidate(choppingBlock[0]);
@@ -316,20 +321,21 @@ function calculateResults() {
     // eliminate 
 
   }
-  console.log(`Winner is:${candidateKeys[0]}`);
-  divInfo.innerHTML = "Scroll to the bottom to see the final winner";
+  divInfo.innerHTML += `Winner is:${candidateKeys[0]}<br />`
 }
 function tallyVotes(candidateKeys, roundNum) {
   // loop through each candidate and reset votes
   candidateKeys.forEach(key => {
     candidates[key].previousFirstPicks = candidates[key].firstPick
     candidates[key].firstPick = 0;
+    candidates[key].previousSecondPick = candidates[key].secondPick
     candidates[key].secondPick = 0;
+    candidates[key].previousThirdPick = candidates[key].thirdPick
     candidates[key].thirdPick = 0;
   })
   // loop through ballot and tally votes for the candidate
   for (let i = 0; i < ballots.length; i += 1) {
-    console.log(candidates);
+    // console.log(candidates);
     // first pick
     if (candidates[ballots[i].getFirstPick()] != undefined) {
       candidates[ballots[i].getFirstPick()].firstPick += 1;
@@ -383,7 +389,9 @@ class Candidates {
     this.firstPick = 0;
     this.previousFirstPicks = 0;
     this.secondPick = 0;
+    this.previousSecondPick = 0;
     this.thirdPick = 0;
+    this.previousThirdPick = 0;
     this.firstPickUpdateRound = 0;
   }
 }
@@ -417,7 +425,8 @@ class Ballot {
   }
   getFirstPick() {
     if (
-      this.rankings.head.next != null
+      this.rankings.head.next != null &&
+      this.rankings.head.next.data != null
     ) {
       return this.rankings.head.next.data;
     }
@@ -426,7 +435,8 @@ class Ballot {
   getSecondPick() {
     if (
       this.rankings.head.next != null &&
-      this.rankings.head.next.next != null
+      this.rankings.head.next.next != null &&
+      this.rankings.head.next.next.data != null
     ) {
       return this.rankings.head.next.next.data;
     }
@@ -436,7 +446,8 @@ class Ballot {
     if (
       this.rankings.head.next != null &&
       this.rankings.head.next.next != null &&
-      this.rankings.head.next.next.next != null
+      this.rankings.head.next.next.next != null &&
+      this.rankings.head.next.next.next.data != null
     ) {
       return this.rankings.head.next.next.next.data;
     }
