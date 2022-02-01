@@ -144,7 +144,7 @@ function parseBallotData() {
 function calculateResults() {
   let candidateKeys = Object.keys(candidates);
   let maxRoundsAllowed = 1000;
-  divInfo.innerHTML = "Scroll to the bottom to see the winner <br /><br /><br />"
+  divInfo.innerHTML = "Scroll to the bottom to see the winner <br />"
   if (candidateKeys.length < 1) {
     divInfo.innerHTML += "No Candidates Found for Election <br />";
     return;
@@ -188,21 +188,32 @@ function calculateResults() {
     });
     // display
     let displayHtml = ""
-    displayHtml += "<table class ='tableStyling'><thead><tr><th>Candidate</th><th>First Picks</th><th>Second Picks</th><th>Third Picks</th></tr></thead>";
+    displayHtml += "<table class ='tableStyling'><thead><tr><th>Candidate</th><th> First Picks </th><th> Second Picks </th><th> Third Picks </th></tr></thead>";
     displayHtml += "<tbody>"
-    let firstPickStyling = "";
-    if(roundNum > 0 &&
-      targetCandidate.firstPick - targetCandidate.previousFirstPicks > 0){
-        firstPickStyling = 'background-color: lightgreen' 
-      }
 
     candidateKeys.forEach(key => {
       let targetCandidate = candidates[key];
+      let firstPickStyling = "";
+      let secondPickStyling = "";
+      let thirdPickStyling = "";
+      if (roundNum > 0 &&
+        targetCandidate.firstPick - targetCandidate.previousFirstPicks > 0) {
+        firstPickStyling = 'background-color: lightgreen'
+      }
+      if (roundNum > 0 &&
+        targetCandidate.secondPick - targetCandidate.previousSecondPick > 0) {
+        secondPickStyling = 'background-color: lightgreen'
+      }
+      if (roundNum > 0 &&
+        targetCandidate.thirdPick - targetCandidate.previousThirdPick > 0) {
+        thirdPickStyling = 'background-color: lightgreen'
+      }
+
       displayHtml += '<tr>'
       displayHtml += `<td>${key}</td>`;
-      displayHtml += `<td style="${targetCandidate.firstPick - targetCandidate.previousFirstPicks > 0 ? 'color : green' : ''}"} >${targetCandidate.firstPick}</td>`;
-      displayHtml += `<td>${targetCandidate.secondPick}</td>`;
-      displayHtml += `<td>${targetCandidate.thirdPick}</td>`;
+      displayHtml += `<td style="${firstPickStyling}"} >${targetCandidate.firstPick}</td>`;
+      displayHtml += `<td style="${secondPickStyling}"} >${targetCandidate.secondPick}</td>`;
+      displayHtml += `<td style="${thirdPickStyling}"} >${targetCandidate.thirdPick}</td>`;
       displayHtml += '</tr>'
     })
     displayHtml += "</tbody></table>";
@@ -311,7 +322,7 @@ function calculateResults() {
         divInfo.innerHTML += `${choppingBlock[i]} marked safe<br />`
       }
     }
-    divInfo.innerHTML += `Eliminating ${choppingBlock[0]}<br />`;
+    divInfo.innerHTML += `<h4 style="color: red">Eliminating ${choppingBlock[0]}</h4>`;
     // re-assign votes
     ballots.forEach(bal => {
       bal.eliminateCandidate(choppingBlock[0]);
@@ -327,7 +338,7 @@ function calculateResults() {
     // eliminate 
 
   }
-  divInfo.innerHTML += `Winner is:${candidateKeys[0]}<br />`
+  divInfo.innerHTML += `<h2>Winner is: ${candidateKeys[0]}</h2><br />`
 }
 function tallyVotes(candidateKeys, roundNum) {
   // loop through each candidate and reset votes
