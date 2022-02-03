@@ -150,8 +150,22 @@ function dragOver(e) {
 
 function dragDrop(e) {
   if (dragSrcEl != this) {
-    dragSrcEl.innerHTML = this.innerHTML;
-    this.innerHTML = e.dataTransfer.getData('text/html');
+    // create new element
+    let listItem = document.createElement("li");
+    listItem.draggable = "true"
+    listItem.classList.add("draggable");
+    listItem.addEventListener('dragstart', dragStart, false);
+    listItem.addEventListener('dragenter', dragEnter, false);
+    listItem.addEventListener('dragover', dragOver, false);
+    listItem.addEventListener('dragleave', dragLeave, false);
+    listItem.addEventListener('drop', dragDrop, false);
+    listItem.addEventListener('dragend', dragEnd, false);
+    listItem.innerHTML = dragSrcEl.innerHTML;
+    let parentDiv = this.parentNode
+    parentDiv.insertBefore(listItem, this);
+    dragSrcEl.remove();
+    //dragSrcEl.innerHTML = this.innerHTML;
+    // this.innerHTML = e.dataTransfer.getData('text/html');
   }
   return false;
 }
@@ -233,6 +247,7 @@ function save() {
     divErrorStatus.innerHTML="";
     buttonSave.style = "display: none";
     divHideAfterSubmit.style = "display: none";
+    window.scrollTo(0, 0);
     
   }).catch(err => {
     divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
