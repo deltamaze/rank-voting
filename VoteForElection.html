@@ -7,23 +7,28 @@
 </head>
 
 <body>
+    <br />
     <h1 id="HeaderElectionName">Election Loading...</h1>
     <br />
-    <div id="DivVoterId">
-        <input id="InputVoterId" type="text" class="input" placeholder="Enter your VoterId" />
-        <br />
-        <div class="DivInfo">Drag and drop candidates.<br /><br />1 = top pick<br />2 = second pick<br />etc...</div>
+    <div id="DivHideAfterSubmit">
+        <div id="DivVoterId">
+
+            <div class="DivInfo">Drag and drop<br /><br />1 = top pick<br />2 = second pick<br />etc...
+            </div>
+
+        </div>
+        <div id="CandidateBlock">
+            <ol type="1" id="OlCandidates">
+            </ol>
+        </div>
     </div>
-    <div id="CandidateBlock">
-        <ol type="1" id="OlCandidates">
-        </ol>
-    </div>
     <div id="DivVoterId">
+        <input id="InputVoterId" type="text" class="input" placeholder="Enter VoterId Here" />
         <input id="ButtonSave" type="button" value="Submit Vote" onclick="save()" />
         <div id="DivSaveStatus" class="DivInfo">Loading</div>
         <div id="DivErrorStatus" class="DivInfo" style="color:red"></div>
     </div>
-    
+
 
     <!-- FIREBASE -->
     <script type="module">

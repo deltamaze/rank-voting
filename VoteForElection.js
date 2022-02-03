@@ -7,11 +7,13 @@ let savedStatus = "";
 var remove = document.querySelector('.draggable');
 
 //document elements
+let divHideAfterSubmit = document.getElementById("DivHideAfterSubmit");
 let headerElectionName = document.getElementById("HeaderElectionName");
 let olCandidateBlock = document.getElementById("OlCandidates");
 let divSaveStatus = document.getElementById("DivSaveStatus")
 let divErrorStatus = document.getElementById("DivErrorStatus")
 let inputVoterId = document.getElementById("InputVoterId")
+let buttonSave = document.getElementById("ButtonSave");
 
 //parse query from uri to load target election
 const queryString = window.location.search;
@@ -207,11 +209,12 @@ function save() {
   // and find out the order they have been submitted in, then package up and
   // A post entry.
   
-  let voterId = inputVoterId.value;
+  let voterId = inputVoterId.value.toUpperCase();
   if(voterId == ''){
-    alert('Please Enter your VoterId')
+    
     inputVoterId.style.border = "2px solid red";
-    window.scrollTo(0, 0);
+    
+    alert('Please Enter your VoterId')
     return;
   }
   inputVoterId.style.border = "2px solid black";
@@ -226,8 +229,11 @@ function save() {
   };
 
   set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
-    divSaveStatus.innerHTML = "Vote Submitted";
+    divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
     divErrorStatus.innerHTML="";
+    buttonSave.style = "display: none";
+    divHideAfterSubmit.style = "display: none";
+    
   }).catch(err => {
     divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
     divErrorStatus.innerHTML = err.toString();
