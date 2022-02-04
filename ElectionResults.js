@@ -285,7 +285,7 @@ function calculateResults() {
       choppingBlockRoundMinVotes = null;
     }
     if (choppingBlock.length == 1) {
-      divInfo.innerHTML += `Candidate with the least votes found: ${choppingBlock[0]}<br />`
+      // divInfo.innerHTML += `Candidate with the least votes found: ${choppingBlock[0]}<br />`
     }
     if (choppingBlock.length > 1) {
       // identify last round updates
@@ -296,13 +296,13 @@ function calculateResults() {
       // remove candidates who reached firstLevelPicks before others on the chopping block
       for (let i = choppingBlock.length - 1; i >= 0; i -= 1) {
         if (candidates[choppingBlock[i]].firstPickUpdateRound < maxRoundNum) {
-          divInfo.innerHTML += `${choppingBlock[i]} Received ${candidates[choppingBlock[i]].firstPickUpdateRound} votes in a round sooner than others, so has been marked safe<br />`;
+          // divInfo.innerHTML += `${choppingBlock[i]} Received votes in a round sooner than others, so has been marked safe<br />`;
           choppingBlock.splice(i, 1);
         }
       }
     }
     if (choppingBlock.length > 1) {
-      divInfo.innerHTML += `${choppingBlock.length} way tie for the least votes. Candidate will need a random tie breaker<br />`;
+      // divInfo.innerHTML += `${choppingBlock.length} way tie for the least votes. Candidate will need a random tie breaker<br />`;
 
       choppingBlock.sort(function (a, b) {
         // use reverse string then sort to make less intuitive how tie breaker works, and slightly more random
@@ -319,7 +319,7 @@ function calculateResults() {
     }
     for (let i = choppingBlock.length - 1; i >= 0; i -= 1) {
       if (i > 0) {
-        divInfo.innerHTML += `${choppingBlock[i]} marked safe<br />`
+        // divInfo.innerHTML += `${choppingBlock[i]} marked safe<br />`
       }
     }
     divInfo.innerHTML += `<h4 style="color: red">Eliminating ${choppingBlock[0]}</h4>`;
@@ -338,7 +338,7 @@ function calculateResults() {
     // eliminate 
 
   }
-  divInfo.innerHTML += `<h2>Winner is: ${candidateKeys[0]}</h2><br />`
+  divInfo.innerHTML += `<h3>Winner is:</h3><br /><h1 style="text-decoration: underline;"> ${candidateKeys[0]} </h1><br />`
 }
 function tallyVotes(candidateKeys, roundNum) {
   // loop through each candidate and reset votes

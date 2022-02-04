@@ -1,31 +1,32 @@
 
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,800");
 
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,800");
 body {
-  background-color: #53a8e6;
+  /* background-color: #53a8e6; */
 }
 body h1 {
   text-align: center;
   font-family: "Raleway", sans-serif;
-  color: white;
+  /* color: white; */
   font-size: 50px;
-  font-weight: normal;
+  font-weight: bold;
+
 }
-body #DivMainSection {
+body #DivVoterId {
   position: relative;
-  /* width: 250px; */
+  width: 250px;
   margin: 0px auto;
   display: block;
   text-align: center;
 }
-body #DivMainSection ::-webkit-input-placeholder {
-  color: #cecece;
+body #DivVoterId ::-webkit-input-placeholder {
+  color: #000000;
 }
-body #DivMainSection .input {
+body #DivVoterId .input {
   outline: none;
-  border: 1px solid white;
-  background-color: #53a8e6;
-  color: white;
+  border: 1px solid black;
+  /* background-color: #dddfe0; */
+  color: black;
   height: 50px;
   width: 250px;
   padding-left: 10px;
@@ -34,7 +35,7 @@ body #DivMainSection .input {
   font-size: 16px;
   margin-left: -5px;
 }
-body #DivMainSection span {
+body #DivVoterId span {
   position: absolute;
   right: 0;
   top: 0;
@@ -43,16 +44,16 @@ body #DivMainSection span {
   line-height: 1.8;
   cursor: pointer;
   transition: all 200ms;
-  color: white;
+  /* color: white; */
   will-change: transform;
 }
-body #DivMainSection span:hover {
+body #DivVoterId span:hover {
   transform: rotate(180deg);
 }
 body .DivInfo {
   text-align: center;
   font-family: "Raleway", sans-serif;
-  color: white;
+  /* color: white; */
   font-size: 30px;
   font-weight: normal;
 }
@@ -66,8 +67,10 @@ body ol .draggable {
   height: 50px;
   /* list-style-type: none; */
   margin: 10px;
-  background-color: white;
+  /* background-color: white; */
   color: #212121;
+  border: 1px solid black;
+  /* background-color: #dddfe0; */
   width: 250px;
   line-height: 3.2;
   padding-left: 10px;
@@ -94,8 +97,12 @@ body ol .draggable:hover:after {
   transform: translate(0);
 }
 
-.over {
+body ol .over {
   transform: scale(1.1, 1.1);
+  border-left:1px solid black;
+  border-right:1px solid black;
+  border-bottom:1px solid black;
+  border-top:10px solid rgb(0, 255, 42);
 }
 #ButtonSave {
     border: 2px solid black;
@@ -103,6 +110,13 @@ body ol .draggable:hover:after {
     padding: 10px;
     background-color: rgb(0, 255, 42);
     text-align: center;
+}
+#InputVoterId {
+  margin-bottom: 5px;
+}
+
+.input::placeholder {
+  font-style: italic;
 }
 .tableStyling {
   margin-left: auto;
@@ -113,5 +127,5 @@ body ol .draggable:hover:after {
 }
 table, th, td {
   border: 1px solid black;
-  background-color: lightgrey;
+  /* background-color: lightgrey; */
 }
