@@ -19,12 +19,12 @@ let divErrorStatus = document.getElementById("DivErrorStatus")
 
 inputElectionName.addEventListener("keydown", function (event) {
   electionName = event.target.value;
-  delayedSave();
+  // delayedSave();
 });
 
 inputElectionName.addEventListener("change", function (event) {
   electionName = event.target.value;
-  delayedSave();
+  // delayedSave();
 });
 
 inputAdminPassword.addEventListener("keydown", function (event) {
@@ -148,11 +148,11 @@ function syncCandidates() {
     textInput.value = candidates[x];
     textInput.addEventListener("keydown", function (event) {
       candidates[x] = event.target.value;
-      delayedSave();
+      // delayedSave();
     })
     textInput.addEventListener("change", function (event) {
       candidates[x] = event.target.value;
-      delayedSave();
+      // delayedSave();
     })
     let deleteButton = document.createElement("input");
     deleteButton.id = `deleteInput${x}`
@@ -162,7 +162,7 @@ function syncCandidates() {
       candidates.splice(x, 1);
       syncCandidates();
       // syncVoters();
-      delayedSave();
+      // delayedSave();
     };
     let linebreak = document.createElement("br");
     divCandidateBlock.appendChild(textInput);
@@ -178,7 +178,7 @@ function syncCandidates() {
 function addCandidate() {
   candidates.push("New Candidate");
   syncCandidates();
-  delayedSave();
+  // delayedSave();
 }
 
 // function addVoter() {
@@ -228,6 +228,7 @@ function debounce(func, wait, immediate) {
 };
 
 function save() {
+  console.log(candidates);
   // A post entry.
   const postData = {
     name: electionName,
