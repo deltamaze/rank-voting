@@ -71,7 +71,7 @@ body ol .draggable {
   color: #212121;
   border: 1px solid black;
   /* background-color: #dddfe0; */
-  width: 250px;
+  width: 500px;
   line-height: 3.2;
   padding-left: 10px;
   cursor: move;
