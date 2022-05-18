@@ -9,7 +9,8 @@ var remove = document.querySelector('.draggable');
 //document elements
 let divHideAfterSubmit = document.getElementById("DivHideAfterSubmit");
 let headerElectionName = document.getElementById("HeaderElectionName");
-let olCandidateBlock = document.getElementById("OlCandidates");
+let muuri = document.getElementById("DivCandidates");
+// let grid = new Muuri('#DivCandidates', {dragEnabled: true});
 let divSaveStatus = document.getElementById("DivSaveStatus")
 let divErrorStatus = document.getElementById("DivErrorStatus")
 let inputVoterId = document.getElementById("InputVoterId")
@@ -110,20 +111,23 @@ function syncCandidates() {
     .map(({ value }) => value)
 
   for (let x = 0; x < shuffledCandidates.length; x += 1) {
-    let listItem = document.createElement("li");
-    listItem.draggable = "true"
+    let listItem = document.createElement("div");
+
+    // listItem.draggable = "true"
     listItem.classList.add("draggable");
-    listItem.addEventListener('dragstart', dragStart, false);
-    listItem.addEventListener('dragenter', dragEnter, false);
-    listItem.addEventListener('dragover', dragOver, false);
-    listItem.addEventListener('dragleave', dragLeave, false);
-    listItem.addEventListener('drop', dragDrop, false);
-    listItem.addEventListener('dragend', dragEnd, false);
+    listItem.classList.add("grid");
+    // listItem.addEventListener('dragstart', dragStart, false);
+    // listItem.addEventListener('dragenter', dragEnter, false);
+    // listItem.addEventListener('dragover', dragOver, false);
+    // listItem.addEventListener('dragleave', dragLeave, false);
+    // listItem.addEventListener('drop', dragDrop, false);
+    // listItem.addEventListener('dragend', dragEnd, false);
     listItem.innerHTML = shuffledCandidates[x];
     // let linebreak = document.createElement("br");
-    olCandidateBlock.appendChild(listItem);
+    muuri.appendChild(listItem);
     // olCandidateBlock.appendChild(linebreak);
   }
+  // let grid = new Muuri(".grid", {dragEnabled: true});
 }
 
 function dragStart(e) {
@@ -268,3 +272,49 @@ function delayedSave() {
   debouncedSave();
 
 }
+
+
+var dragContainer = document.querySelector('.drag-container');
+var itemContainers = [].slice.call(document.querySelectorAll('.board-column-content'));
+var columnGrids = [];
+var boardGrid;
+
+// Init the column grids so we can drag those items around.
+itemContainers.forEach(function (container) {
+  var grid = new Muuri(container, {
+    items: '.board-item',
+    dragEnabled: true,
+    dragSort: function () {
+      return columnGrids;
+    },
+    dragContainer: dragContainer,
+    dragAutoScroll: {
+      targets: (item) => {
+        return [
+          { element: window, priority: 0 },
+          { element: item.getGrid().getElement().parentNode, priority: 1 },
+        ];
+      }
+    },
+  })
+  .on('dragInit', function (item) {
+    item.getElement().style.width = item.getWidth() + 'px';
+    item.getElement().style.height = item.getHeight() + 'px';
+  })
+  .on('dragReleaseEnd', function (item) {
+    item.getElement().style.width = '';
+    item.getElement().style.height = '';
+    item.getGrid().refreshItems([item]);
+  })
+  .on('layoutStart', function () {
+    boardGrid.refreshItems().layout();
+  });
+
+  columnGrids.push(grid);
+});
+
+// Init board grid so we can drag those columns around.
+boardGrid = new Muuri('.board', {
+  dragEnabled: false,
+  dragHandle: '.board-column-header'
+});
