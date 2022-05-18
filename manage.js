@@ -228,6 +228,14 @@ function debounce(func, wait, immediate) {
 };
 
 function save() {
+  //remove any "New Candidates"
+  for (let x = 0; x < candidates.length; x += 1) {
+    if (candidates[x] == "New Candidate"){
+      candidates.splice(x, 1);
+      syncCandidates();
+    };
+  }
+
   console.log(candidates);
   // A post entry.
   const postData = {
