@@ -9,7 +9,7 @@ var remove = document.querySelector('.draggable');
 //document elements
 let divHideAfterSubmit = document.getElementById("DivHideAfterSubmit");
 let headerElectionName = document.getElementById("HeaderElectionName");
-let muuri = document.getElementById("DivCandidates");
+let muuri = document.getElementById("divCandidateList");
 // let grid = new Muuri('#DivCandidates', {dragEnabled: true});
 let divSaveStatus = document.getElementById("DivSaveStatus")
 let divErrorStatus = document.getElementById("DivErrorStatus")
@@ -112,21 +112,17 @@ function syncCandidates() {
 
   for (let x = 0; x < shuffledCandidates.length; x += 1) {
     let listItem = document.createElement("div");
-
-    // listItem.draggable = "true"
-    listItem.classList.add("draggable");
-    listItem.classList.add("grid");
-    // listItem.addEventListener('dragstart', dragStart, false);
-    // listItem.addEventListener('dragenter', dragEnter, false);
-    // listItem.addEventListener('dragover', dragOver, false);
-    // listItem.addEventListener('dragleave', dragLeave, false);
-    // listItem.addEventListener('drop', dragDrop, false);
-    // listItem.addEventListener('dragend', dragEnd, false);
-    listItem.innerHTML = shuffledCandidates[x];
+    listItem.classList.add("board-item");
+    let listItemContent = document.createElement("div")
+    listItem.classList.add("board-item-content");
+    listItemContent.innerHTML = shuffledCandidates[x];
+    listItem.appendChild(listItemContent);
     // let linebreak = document.createElement("br");
     muuri.appendChild(listItem);
     // olCandidateBlock.appendChild(linebreak);
+    InitMuuri()
   }
+  console.log("test5")
   // let grid = new Muuri(".grid", {dragEnabled: true});
 }
 
@@ -226,12 +222,12 @@ function save() {
   // read div element with all the candidates
   // and find out the order they have been submitted in, then package up and
   // A post entry.
-  
+
   let voterId = inputVoterId.value.toUpperCase();
-  if(voterId == ''){
-    
+  if (voterId == '') {
+
     inputVoterId.style.border = "2px solid red";
-    
+
     alert('Please Enter your VoterId')
     return;
   }
@@ -248,11 +244,11 @@ function save() {
 
   set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
     divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
-    divErrorStatus.innerHTML="";
+    divErrorStatus.innerHTML = "";
     buttonSave.style = "display: none";
     divHideAfterSubmit.style = "display: none";
     window.scrollTo(0, 0);
-    
+
   }).catch(err => {
     divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
     divErrorStatus.innerHTML = err.toString();
@@ -273,48 +269,50 @@ function delayedSave() {
 
 }
 
+function InitMuuri() {
+  var dragContainer = document.querySelector('.drag-container');
+  var itemContainers = [].slice.call(document.querySelectorAll('.board-column-content'));
+  var columnGrids = [];
+  var boardGrid;
 
-var dragContainer = document.querySelector('.drag-container');
-var itemContainers = [].slice.call(document.querySelectorAll('.board-column-content'));
-var columnGrids = [];
-var boardGrid;
+  // Init the column grids so we can drag those items around.
+  itemContainers.forEach(function (container) {
+    var grid = new Muuri(container, {
+      items: '.board-item',
+      dragEnabled: true,
+      dragSort: function () {
+        return columnGrids;
+      },
+      dragContainer: dragContainer,
+      dragAutoScroll: {
+        targets: (item) => {
+          return [
+            { element: window, priority: 0 },
+            { element: item.getGrid().getElement().parentNode, priority: 1 },
+          ];
+        }
+      },
+    })
+      .on('dragInit', function (item) {
+        item.getElement().style.width = item.getWidth() + 'px';
+        item.getElement().style.height = item.getHeight() + 'px';
+      })
+      .on('dragReleaseEnd', function (item) {
+        item.getElement().style.width = '';
+        item.getElement().style.height = '';
+        item.getGrid().refreshItems([item]);
+      })
+      .on('layoutStart', function () {
+        boardGrid.refreshItems().layout();
+      });
 
-// Init the column grids so we can drag those items around.
-itemContainers.forEach(function (container) {
-  var grid = new Muuri(container, {
-    items: '.board-item',
-    dragEnabled: true,
-    dragSort: function () {
-      return columnGrids;
-    },
-    dragContainer: dragContainer,
-    dragAutoScroll: {
-      targets: (item) => {
-        return [
-          { element: window, priority: 0 },
-          { element: item.getGrid().getElement().parentNode, priority: 1 },
-        ];
-      }
-    },
-  })
-  .on('dragInit', function (item) {
-    item.getElement().style.width = item.getWidth() + 'px';
-    item.getElement().style.height = item.getHeight() + 'px';
-  })
-  .on('dragReleaseEnd', function (item) {
-    item.getElement().style.width = '';
-    item.getElement().style.height = '';
-    item.getGrid().refreshItems([item]);
-  })
-  .on('layoutStart', function () {
-    boardGrid.refreshItems().layout();
+    columnGrids.push(grid);
   });
 
-  columnGrids.push(grid);
-});
+  // Init board grid so we can drag those columns around.
+  boardGrid = new Muuri('.board', {
+    dragEnabled: false,
+    dragHandle: '.board-column-header'
+  });
+}
 
-// Init board grid so we can drag those columns around.
-boardGrid = new Muuri('.board', {
-  dragEnabled: false,
-  dragHandle: '.board-column-header'
-});
