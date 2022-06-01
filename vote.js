@@ -187,30 +187,21 @@ function save() {
     rankedArray.push(item._element.innerText);
   })
 
-  //TODO old logic below, replace with new logic
-  // var listItems = document.querySelectorAll('.draggable');
-  // [].forEach.call(listItems, function (item) {
-  //   rankedArray.push(item.innerHTML);
-  // });
-
   const postData = {
     rankedCandidates: package(rankedArray)
   };
 
-  console.log(rankedArray);
+  set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
+    divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
+    divErrorStatus.innerHTML = "";
+    buttonSave.style = "display: none";
+    divHideAfterSubmit.style = "display: none";
+    window.scrollTo(0, 0);
 
-  //TODO uncomment once rankedCandidates array verified with new method
-  // set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
-  //   divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
-  //   divErrorStatus.innerHTML = "";
-  //   buttonSave.style = "display: none";
-  //   divHideAfterSubmit.style = "display: none";
-  //   window.scrollTo(0, 0);
-
-  // }).catch(err => {
-  //   divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
-  //   divErrorStatus.innerHTML = err.toString();
-  // });
+  }).catch(err => {
+    divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
+    divErrorStatus.innerHTML = err.toString();
+  });
 
 }
 const debouncedSave = debounce(function () {
