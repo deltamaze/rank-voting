@@ -2,52 +2,43 @@
 
 <head>
     <title>RankVoting</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="vote.css">
 </head>
 
 <body>
     <br />
-    <h5>AdminPassword</h5>
-    <input id="InputAdminPassword" type="text" />
+    <h1 id="title">Election Loading...</h1>
     <br />
+    Ranked Voting!
     <br />
+    Drag and Drop Options in Order of
     <br />
-    <h5>Create</h5>
-    <input type="button" value="Create New" onclick="addNewElection()">
-    <br />
-    <br />
-    <br />
-    <h5>Edit Existing Election</h5>
-    <input id="InputExistingElectionId" type="text" placeholder="Election ID" />
-    <br />
-    <input type="button" value="Load Previously Saved Election" onclick="loadPreviouslySavedElectionButtonClick()">
+    Most Favorite, to Least Favorite!
+    <div id="hide-after-submit">
 
-    <br />
-    <br />
-    <h5 id="DivElectionId">Manage Election ID: NOT SET</h5>
-    <div>Election Name</div>
-    <input id="InputElectionName" type="text" />
-    <br />
-    <br />
-    <div>Candidates</div>
-    <div id="DivCandidateBlock"></div>
-    <br />
-    <input type="button" value="Add New Candidates" onclick="addCandidate()">
+        <div class="board">
+            <div class="board-column todo">
+                <div class="board-column-container">
+                    <div class="board-column-header">Most Favorite</div>
+                    <div class="board-column-content-wrapper">
+                        <div id = "candidate-list-section" class="board-column-content">
+                        </div>
+                    </div>
+                    <div class="board-column-footer">Least Favorite</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="voter-id-section">
+        <input id="voter-id-input" type="text" class="input" style="min-height: 5rem;"
+            placeholder="Enter Discord Username Here" />
+        <input id="save-button" type="button" value="Submit Vote" onclick="save()" />
+        <div id="save-status" >Loading</div>
+        <div id="error-status" style="color:red"></div>
+    </div>
 
-    <br />
-    <br />
-    <input type="button" value="Save" onclick="save()">
-    <br />
-    <!-- <div>Allowed Voters, leave blank for open Election with duplicate voting risk</div>
-    <div id="DivVoterBlock"></div>
-    <br />
-    <br />
-    <input type="button" value="Add New Voter">
-    <br /> -->
-    <br />
-    <div id="DivSaveStatus">No Election is loaded</div>
-    <div id="DivErrorStatus" style="color:red"></div>
+
     <!-- FIREBASE -->
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -83,8 +74,11 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+
     <!-- SOURCE JS -->
-    <script src="ManageElection.js"></script>
+    <script src="muuri.js"></script>
+    <script src="vote.js"></script>
+
 </body>
 
 </html>

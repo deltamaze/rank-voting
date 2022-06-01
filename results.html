@@ -3,31 +3,19 @@
 <head>
     <title>RankVoting</title>
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
-    <link rel="stylesheet" href="VoteForElection.css">
+    <link rel="stylesheet" href="results.css">
 </head>
 
 <body>
-    <br />
     <h1 id="HeaderElectionName">Election Loading...</h1>
     <br />
-    <div id="DivHideAfterSubmit">
-        <div id="DivVoterId">
-
-            <div class="DivInfo">Drag and drop<br />Rank the Options<br />1 = top pick<br />2 = second pick<br />etc...
-            </div>
-
+    <div id="DivMainSection">
+        <div class="DivInfo" id="DivInfo">Results Loading</div>
+        <div id="Rounds">
         </div>
-        <div id="CandidateBlock">
-            <ol type="1" id="OlCandidates">
-            </ol>
-        </div>
-    </div>
-    <div id="DivVoterId">
-        <input id="InputVoterId" type="text" class="input" style="min-height: 5rem;" placeholder="Enter Discord Username Here" />
-        <input id="ButtonSave" type="button" value="Submit Vote" onclick="save()" />
-        <div id="DivSaveStatus" class="DivInfo">Loading</div>
         <div id="DivErrorStatus" class="DivInfo" style="color:red"></div>
     </div>
+
 
 
     <!-- FIREBASE -->
@@ -67,7 +55,7 @@
         crossorigin="anonymous"></script>
 
     <!-- SOURCE JS -->
-    <script src="VoteForElection.js"></script>
+    <script src="results.js"></script>
 
 </body>
 
