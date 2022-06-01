@@ -3,18 +3,21 @@ let candidates = [];
 let electionName = "";
 let electionId = "";
 let savedStatus = "";
-
-var remove = document.querySelector('.draggable');
+const delimCharacter = "~";
 
 //document elements
-let divHideAfterSubmit = document.getElementById("DivHideAfterSubmit");
-let headerElectionName = document.getElementById("HeaderElectionName");
-let muuri = document.getElementById("divCandidateList");
-// let grid = new Muuri('#DivCandidates', {dragEnabled: true});
-let divSaveStatus = document.getElementById("DivSaveStatus")
-let divErrorStatus = document.getElementById("DivErrorStatus")
-let inputVoterId = document.getElementById("InputVoterId")
-let buttonSave = document.getElementById("ButtonSave");
+let divHideAfterSubmit = document.getElementById("hide-after-submit");
+let headerElectionName = document.getElementById("title");
+let divCandidateList = document.getElementById("candidate-list-section");
+let divSaveStatus = document.getElementById("save-status")
+let divErrorStatus = document.getElementById("error-status")
+let inputVoterId = document.getElementById("voter-id-input")
+let buttonSave = document.getElementById("save-button");
+
+//board variables
+var itemContainers = [];
+var columnGrids = [];
+var boardGrid;
 
 //parse query from uri to load target election
 const queryString = window.location.search;
@@ -49,8 +52,6 @@ function parseUriQuery() {
   }
 
 }
-
-const delimCharacter = "~";
 
 function searchElection() {
   if (electionId == "") {
@@ -114,68 +115,15 @@ function syncCandidates() {
     let listItem = document.createElement("div");
     listItem.classList.add("board-item");
     let listItemContent = document.createElement("div")
-    listItem.classList.add("board-item-content");
+    listItemContent.classList.add("board-item-content");
     listItemContent.innerHTML = shuffledCandidates[x];
     listItem.appendChild(listItemContent);
     // let linebreak = document.createElement("br");
-    muuri.appendChild(listItem);
+    divCandidateList.appendChild(listItem);
     // olCandidateBlock.appendChild(linebreak);
-    InitMuuri()
+
   }
-  console.log("test5")
-  // let grid = new Muuri(".grid", {dragEnabled: true});
-}
-
-function dragStart(e) {
-  this.style.opacity = '0.4';
-  dragSrcEl = this;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/html', this.innerHTML);
-};
-
-function dragEnter(e) {
-  this.classList.add('over');
-}
-
-function dragLeave(e) {
-  e.stopPropagation();
-  this.classList.remove('over');
-}
-
-function dragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  return false;
-}
-
-function dragDrop(e) {
-  if (dragSrcEl != this) {
-    // create new element
-    let listItem = document.createElement("li");
-    listItem.draggable = "true"
-    listItem.classList.add("draggable");
-    listItem.addEventListener('dragstart', dragStart, false);
-    listItem.addEventListener('dragenter', dragEnter, false);
-    listItem.addEventListener('dragover', dragOver, false);
-    listItem.addEventListener('dragleave', dragLeave, false);
-    listItem.addEventListener('drop', dragDrop, false);
-    listItem.addEventListener('dragend', dragEnd, false);
-    listItem.innerHTML = dragSrcEl.innerHTML;
-    let parentDiv = this.parentNode
-    parentDiv.insertBefore(listItem, this);
-    dragSrcEl.remove();
-    //dragSrcEl.innerHTML = this.innerHTML;
-    // this.innerHTML = e.dataTransfer.getData('text/html');
-  }
-  return false;
-}
-
-function dragEnd(e) {
-  var listItems = document.querySelectorAll('.draggable');
-  [].forEach.call(listItems, function (item) {
-    item.classList.remove('over');
-  });
-  this.style.opacity = '1';
+  initMuuriBoard()
 }
 
 function package(array) {
@@ -234,25 +182,35 @@ function save() {
   inputVoterId.style.border = "2px solid black";
   // loop through ol and read entries in order
   let rankedArray = []
-  var listItems = document.querySelectorAll('.draggable');
-  [].forEach.call(listItems, function (item) {
-    rankedArray.push(item.innerHTML);
-  });
+  
+  columnGrids[0].getItems().forEach( item => {
+    rankedArray.push(item._element.innerText);
+  })
+
+  //TODO old logic below, replace with new logic
+  // var listItems = document.querySelectorAll('.draggable');
+  // [].forEach.call(listItems, function (item) {
+  //   rankedArray.push(item.innerHTML);
+  // });
+
   const postData = {
     rankedCandidates: package(rankedArray)
   };
 
-  set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
-    divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
-    divErrorStatus.innerHTML = "";
-    buttonSave.style = "display: none";
-    divHideAfterSubmit.style = "display: none";
-    window.scrollTo(0, 0);
+  console.log(rankedArray);
 
-  }).catch(err => {
-    divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
-    divErrorStatus.innerHTML = err.toString();
-  });
+  //TODO uncomment once rankedCandidates array verified with new method
+  // set(ref(database, `/Ballots/${electionId}/${voterId}`), postData).then(data => {
+  //   divSaveStatus.innerHTML = `Vote Submitted <br /><br />Thank you for your service voter: ${inputVoterId.value.toUpperCase()}`;
+  //   divErrorStatus.innerHTML = "";
+  //   buttonSave.style = "display: none";
+  //   divHideAfterSubmit.style = "display: none";
+  //   window.scrollTo(0, 0);
+
+  // }).catch(err => {
+  //   divSaveStatus.innerHTML = "Unable to cast vote. See Error below";
+  //   divErrorStatus.innerHTML = err.toString();
+  // });
 
 }
 const debouncedSave = debounce(function () {
@@ -269,11 +227,10 @@ function delayedSave() {
 
 }
 
-function InitMuuri() {
+function initMuuriBoard() {
   var dragContainer = document.querySelector('.drag-container');
-  var itemContainers = [].slice.call(document.querySelectorAll('.board-column-content'));
-  var columnGrids = [];
-  var boardGrid;
+  itemContainers = [].slice.call(document.querySelectorAll('.board-column-content'));
+  columnGrids = [];
 
   // Init the column grids so we can drag those items around.
   itemContainers.forEach(function (container) {
