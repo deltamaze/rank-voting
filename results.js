@@ -134,7 +134,7 @@ function parseBallotData() {
     let rankedVote = unpack(ballotData[key].rankedCandidates)
     let ballot = new Ballot();
     for (let i = 0; i < rankedVote.length; i++) {
-      ballot.addCandidate(rankedVote[i]);
+      ballot.addCandidate(rankedVote[i].replace(/(\r\n|\n|\r)/gm, ""));
     }
     ballots[insertIndex] = ballot;
     insertIndex += 1;
