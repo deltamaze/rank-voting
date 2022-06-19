@@ -111,18 +111,33 @@ function syncCandidates() {
     .sort((a, b) => a.sort - b.sort)
     .map(({ value }) => value)
 
+  // generate html elements
+
   for (let x = 0; x < shuffledCandidates.length; x += 1) {
     let listItem = document.createElement("div");
     listItem.classList.add("board-item");
     let listItemContent = document.createElement("div")
     listItemContent.classList.add("board-item-content");
-    listItemContent.innerHTML = shuffledCandidates[x];
+    let splitEntry = shuffledCandidates[x].split("#");
+    let entryTitle = splitEntry[0];
+    let url = ""
+    if(splitEntry.length > 0){
+      url = splitEntry[1];
+    }
+    listItemContent.innerHTML = entryTitle;
+
+    listItemContent.addEventListener('dblclick', function (e) {
+      window.open(
+        url, "_blank");
+    });
+
     listItem.appendChild(listItemContent);
     // let linebreak = document.createElement("br");
     divCandidateList.appendChild(listItem);
     // olCandidateBlock.appendChild(linebreak);
 
   }
+
   initMuuriBoard()
 }
 
